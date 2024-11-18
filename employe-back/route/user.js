@@ -1,0 +1,25 @@
+const express=require ('express');
+const router=express.Router();
+const jwt=require("jsonwebtoken")
+require('../db/connection')
+const userModel=require('../models/userData')
+router.use(express.json())
+
+router.post('/login',async(req,res)=>{
+    const user=await userModel.findOne({username:req.body.username})
+    if(!user){
+        res.json({message:"user not found"})
+    }
+    try{
+        if(user.password==req.body.password)
+        {
+            const payload={uname:req.body.username,pwd:req.body.password}
+            const token=jwt.sign(payload,"secret")
+            res.status(200).send({message:"login successful",usertoken:token})
+        }
+    }
+    catch(error){
+console.log(error)
+    }
+})
+module.exports=router
